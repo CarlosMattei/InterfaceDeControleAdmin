@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADMIN - Entre Linhas</title>
+    <!-- UIkit CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.21.13/dist/css/uikit.min.css" />
+    
+    <!-- UIkit JS -->
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.21.13/dist/js/uikit.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.21.13/dist/js/uikit-icons.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div id="navbar"></div>
+    <div id="content"></div>
+
+    <script>
+        // Carregar a navbar
+        fetch('navbar.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('navbar').innerHTML = data;
+            })
+            .catch(error => console.error('Erro ao carregar a navbar:', error));
+
+        // Carregar o conteúdo da página inicial
+        loadContent('home');
+
+        // Função para carregar o conteúdo na div 'content'
+        function loadContent(page) {
+            let path;
+            // Verifica se a página está na pasta admin ou na raiz
+            if (page === 'home') {
+                path = `./${page}.html`;  // Páginas fora da pasta admin
+            } else {
+                path = `./admin/${page}.html`;  // Páginas dentro da pasta admin
+            }
+
+            // Carrega o conteúdo
+            fetch(path)
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('content').innerHTML = data;
+                    localStorage.setItem('currentPage', page);
+                })
+                .catch(error => console.error('Erro ao carregar o conteúdo:', error));
+        }
+
+        // Captura todos os links da navbar
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.uk-navbar-nav a').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault(); // Prevenir o comportamento padrão
+                    const page = this.getAttribute('href').replace('/', ''); // Pega o valor do href sem modificar a extensão
+                    loadContent(page); // Chama a função para carregar o conteúdo
+                });
+            });
+        });
+
+        const savedPage = localStorage.getItem('currentPage') || 'home.html'; // Define a página inicial como 'home' se não houver uma página salva
+        loadContent(savedPage);
+    </script>
+</body>
+</html>
